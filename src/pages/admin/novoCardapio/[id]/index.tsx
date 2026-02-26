@@ -43,7 +43,7 @@ export default function PageFormCardapio() {
     async function fetchData() {
       try {
         setLoadingData(true);
-
+        if (!idString) return;
         const data = await getCardapioById(idString);
 
         // ✅ fallback se não existir
