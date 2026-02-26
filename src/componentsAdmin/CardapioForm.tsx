@@ -40,6 +40,23 @@ export default function CardapioForm({
     }
   };
 
+  const handleRemoveImage = async () => {
+    try {
+      // remove preview novo
+      setSelectedFile(null);
+
+      // se já existir imagem salva → apaga do Firebase
+      if (card.imageUrl) {
+        await deleteImageFromFirebase(card.imageUrl);
+      }
+
+      // limpa do estado do card
+      onChange({ ...card, imageUrl: "" });
+    } catch (err) {
+      console.error("Erro ao remover imagem:", err);
+    }
+  };
+
   return (
     <div className="space-y-5 bg-white p-6 md:p-8 rounded-2xl shadow-sm border border-gray-200 max-w-xl mx-auto">
       {/* 🔹 Tópico */}
@@ -71,9 +88,7 @@ export default function CardapioForm({
           placeholder="Detalhes do cardápio "
           className={inputStyle}
           value={card.description}
-          onChange={(e) =>
-            onChange({ ...card, description: e.target.value })
-          }
+          onChange={(e) => onChange({ ...card, description: e.target.value })}
         />
       </Field>
 
@@ -99,9 +114,7 @@ export default function CardapioForm({
 
         <button
           type="button"
-          onClick={() =>
-            onChange({ ...card, disponivel: !card.disponivel })
-          }
+          onClick={() => onChange({ ...card, disponivel: !card.disponivel })}
           className={`relative w-12 h-6 rounded-full transition ${
             card.disponivel ? "bg-green-500" : "bg-gray-300"
           }`}
@@ -120,14 +133,29 @@ export default function CardapioForm({
           Imagem do prato
         </label>
 
-        <ImageUploader onSelect={(file) => setSelectedFile(file)} />
+        <ImageUploader
+          onSelect={(file) => setSelectedFile(file)}
+          onRemove={handleRemoveImage}
+        />
 
-        {card.imageUrl && (
-          <img
-            src={card.imageUrl}
-            alt="Imagem existente"
-            className="w-32 h-32 object-cover rounded-xl border border-gray-200 shadow-sm"
-          />
+        {card.imageUrl && !selectedFile && (
+          <div className="flex items-start gap-3">
+            <img
+              src={card.imageUrl}
+              alt="Imagem existente"
+              className="w-32 h-32 object-cover rounded-xl border border-gray-200 shadow-sm"
+            />
+
+            <button
+              type="button"
+              onClick={handleRemoveImage}
+              className="h-fit px-3 py-1.5 text-sm font-medium rounded-lg
+                 bg-red-50 text-red-600 hover:bg-red-100
+                 border border-red-200 transition"
+            >
+              Remover
+            </button>
+          </div>
         )}
       </div>
 
@@ -156,9 +184,7 @@ function Field({
 }) {
   return (
     <div className="space-y-1.5">
-      <label className="text-sm font-semibold text-gray-700">
-        {label}
-      </label>
+      <label className="text-sm font-semibold text-gray-700">{label}</label>
       {children}
     </div>
   );

@@ -6,8 +6,8 @@ import { useAuthRedirectAdmin } from "../../hoohsAdmin/useAuthRedirectAdmin";
 import { auth } from "@/src/firebase/firebaseConfig";
 import HeaderAdmin from "@/src/componentsAdmin/HeaderAdmin";
 import Loading from "@/src/componentsAdmin/Loading";
-import CardapioAdmin from "@/src/componentsAdmin/abas/CardapioAdmin";
-import PerfilAdmin from "@/src/componentsAdmin/abas/PerfilAdmin";
+import CardapioAdmin from "@/src/pages/admin/abas/CardapioAdmin";
+import PerfilAdmin from "@/src/pages/admin/abas/PerfilAdmin";
 
 export default function HomeAdmin() {
   const { loading } = useAuthRedirectAdmin();

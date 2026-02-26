@@ -1,12 +1,12 @@
 import { CardapioProduto } from "@/src/types/cardapio";
 import { useEffect, useState } from "react";
-import CardViewCardapioAdm from "../CardViewCardapioAdm";
+import CardViewCardapioAdm from "../../../componentsAdmin/CardViewCardapioAdm";
 import { useRouter } from "next/navigation";
 import {
   deleteCardapio,
   getCardapioOnce,
 } from "@/src/services/cardapioService";
-import Loading from "../Loading";
+import Loading from "../../../componentsAdmin/Loading";
 
 // src/componentsAdmin/Abas/CardapioAdmin.tsx
 export default function CardapioAdmin() {
@@ -32,7 +32,7 @@ export default function CardapioAdmin() {
   }
 
   function edit(id: string) {
-    router.push(`/admin/editCardapio/${id}`);
+    router.push(`/admin/novoCardapio/${id}`);
   }
 
   async function fetchData() {
