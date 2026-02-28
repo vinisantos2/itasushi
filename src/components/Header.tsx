@@ -7,7 +7,7 @@ const menu = [
   { nome: "Sobre", url: "#sobre" },
   { nome: "Contato", url: "#contato" },
   { nome: "Cardápio", url: "/cardapio" },
-  { nome: "Depoimentos", url: "#depoimentos" },
+  // { nome: "Depoimentos", url: "#depoimentos" },
 ];
 
 export default function Header() {
