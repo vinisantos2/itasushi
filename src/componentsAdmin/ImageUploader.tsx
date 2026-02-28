@@ -1,27 +1,42 @@
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
+import { convertImageToWebP } from '@/src/utils/imageUtils'
 
 type Props = {
   onSelect: (file: File) => void
-  onRemove?: () => void // ⭐ opcional
+  onRemove?: () => void
 }
 
 export default function ImageUploader({ onSelect, onRemove }: Props) {
   const [previewUrl, setPreviewUrl] = useState<string | null>(null)
+  const [loading, setLoading] = useState(false)
   const inputRef = useRef<HTMLInputElement | null>(null)
 
-  const handleSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
     if (!file) return
 
-    const url = URL.createObjectURL(file)
-    setPreviewUrl(url)
-    onSelect(file)
+    try {
+      setLoading(true)
 
-    // permite selecionar o mesmo arquivo novamente
-    if (inputRef.current) {
-      inputRef.current.value = ''
+      // 🔥 CONVERSÃO ACONTECE AQUI
+      const optimizedFile = await convertImageToWebP(file)
+
+      const url = URL.createObjectURL(optimizedFile)
+      setPreviewUrl(url)
+
+      onSelect(optimizedFile)
+
+      // permite selecionar o mesmo arquivo novamente
+      if (inputRef.current) {
+        inputRef.current.value = ''
+      }
+    } catch (error) {
+      console.error('Erro ao processar imagem:', error)
+      alert('Erro ao processar imagem.')
+    } finally {
+      setLoading(false)
     }
   }
 
@@ -32,7 +47,6 @@ export default function ImageUploader({ onSelect, onRemove }: Props) {
 
     setPreviewUrl(null)
 
-    // limpa input
     if (inputRef.current) {
       inputRef.current.value = ''
     }
@@ -40,7 +54,7 @@ export default function ImageUploader({ onSelect, onRemove }: Props) {
     onRemove?.()
   }
 
-  // evita memory leak ao desmontar
+  // cleanup
   useEffect(() => {
     return () => {
       if (previewUrl) {
@@ -56,12 +70,18 @@ export default function ImageUploader({ onSelect, onRemove }: Props) {
         type="file"
         accept="image/*"
         onChange={handleSelect}
+        disabled={loading}
         className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4
                    file:rounded file:border-0 file:text-sm file:font-semibold
-                   file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+                   file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100
+                   disabled:opacity-50"
       />
 
-      {previewUrl && (
+      {loading && (
+        <p className="text-sm text-gray-500">Processando imagem...</p>
+      )}
+
+      {previewUrl && !loading && (
         <div className="flex items-start gap-3">
           <img
             src={previewUrl}

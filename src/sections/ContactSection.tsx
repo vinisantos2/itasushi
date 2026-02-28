@@ -41,11 +41,17 @@ export function ContactSection() {
           {/* INFO + MAPA */}
           <div className="space-y-6">
             <div className="space-y-2 text-gray-200">
-              <p><strong className="text-white">Telefone:</strong> (75) 99984-3434</p>
-              <p><strong className="text-white">Email:</strong> itasushibar@gmail.com</p>
               <p>
-                <strong className="text-white">Endereço:</strong>  
-                Centro, Ribeira do Pombal - BA
+                <strong className="text-white">Telefone:</strong> (75)
+                99984-3434
+              </p>
+              <p>
+                <strong className="text-white">Email:</strong>{" "}
+                itasushibar@gmail.com
+              </p>
+              <p>
+                <strong className="text-white">Endereço: </strong>
+                Rua da palmeira Nº 115, Centro, Itaberaba - BA
               </p>
               <p className="text-sm text-gray-300">
                 Atendimento de segunda a domingo, das 18h às 23h.
@@ -55,11 +61,11 @@ export function ContactSection() {
             {/* MAPA */}
             <div className="w-full h-[320px] rounded-2xl overflow-hidden border border-red-500/30">
               <iframe
-                src="https://www.google.com/maps?q=Ribeira%20do%20Pombal%20BA&output=embed"
-                className="w-full h-full border-0"
+                src="https://www.google.com/maps/embed?pb=!1m17!1m12!1m3!1d1947.3663076576233!2d-40.305760461540096!3d-12.533864378646811!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m2!1m1!2zMTLCsDMyJzAxLjkiUyA0MMKwMTgnMTYuMSJX!5e0!3m2!1spt-BR!2sbr!4v1772295600907!5m2!1spt-BR!2sbr"
+                width="600"
+                height="450"
                 loading="lazy"
-                referrerPolicy="no-referrer-when-downgrade"
-              />
+              ></iframe>
             </div>
           </div>
         </div>

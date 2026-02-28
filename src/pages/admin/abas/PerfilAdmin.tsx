@@ -1,14 +1,21 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { auth } from "@/src/firebase/firebaseConfig";
+import { auth, db } from "@/src/firebase/firebaseConfig";
 import { User } from "firebase/auth";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { useRouter } from "next/navigation";
+import { doc, getDoc, setDoc } from "firebase/firestore";
+import { uploadFachada } from "@/src/firebase/uploadImage";
+import ImageUploader from "@/src/componentsAdmin/ImageUploader";
 
 export default function PerfilAdmin() {
   const [user, setUser] = useState<User | null>(null);
+  const [fachadaUrl, setFachadaUrl] = useState<string | null>(null);
+  const [file, setFile] = useState<File | null>(null);
+  const [loadingFachada, setLoadingFachada] = useState(false);
+
   const router = useRouter();
 
   useEffect(() => {
@@ -16,8 +23,48 @@ export default function PerfilAdmin() {
       setUser(firebaseUser);
     });
 
+    async function loadFachada() {
+      try {
+        const ref = doc(db, "site", "institucional");
+        const snap = await getDoc(ref);
+
+        if (snap.exists()) {
+          setFachadaUrl(snap.data().fachadaUrl || null);
+        }
+      } catch (error) {
+        console.error("Erro ao carregar fachada:", error);
+      }
+    }
+
+    loadFachada();
+
     return () => unsubscribe();
   }, []);
+
+  async function handleUploadFachada() {
+    if (!file) return;
+
+    try {
+      setLoadingFachada(true);
+
+      // ✅ agora o arquivo já vem convertido do uploader
+      const url = await uploadFachada(file);
+
+      await setDoc(
+        doc(db, "site", "institucional"),
+        { fachadaUrl: url },
+        { merge: true }
+      );
+
+      setFachadaUrl(url);
+      setFile(null);
+    } catch (error) {
+      console.error("Erro ao atualizar fachada:", error);
+      alert("Erro ao atualizar fachada.");
+    } finally {
+      setLoadingFachada(false);
+    }
+  }
 
   if (!user) {
     return (
@@ -26,6 +73,8 @@ export default function PerfilAdmin() {
       </div>
     );
   }
+
+  const showServerImage = !file && fachadaUrl;
 
   return (
     <section className="space-y-6">
@@ -46,7 +95,7 @@ export default function PerfilAdmin() {
         </button>
       </div>
 
-      {/* Card */}
+      {/* Card Perfil */}
       <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 md:p-8 max-w-2xl">
         <div className="space-y-4 text-gray-700">
           <InfoRow label="Email" value={user.email || "-"} />
@@ -73,6 +122,43 @@ export default function PerfilAdmin() {
               )}
             />
           )}
+        </div>
+      </div>
+
+      {/* ================= FACHADA ================= */}
+      <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 md:p-8 max-w-2xl">
+        <h2 className="text-xl font-bold text-gray-800 mb-4">
+          🏪 Fachada do Restaurante
+        </h2>
+
+        <div className="space-y-4">
+          {/* imagem atual do servidor */}
+          {showServerImage && (
+            <div className="w-full h-48 rounded-xl border overflow-hidden bg-gray-100">
+              <img
+                src={fachadaUrl!}
+                alt="Fachada atual"
+                className="w-full h-full object-cover"
+              />
+            </div>
+          )}
+
+          {/* uploader inteligente */}
+          <ImageUploader
+            onSelect={(selectedFile) => setFile(selectedFile)}
+            onRemove={() => setFile(null)}
+          />
+
+          {/* botão */}
+          <button
+            onClick={handleUploadFachada}
+            disabled={!file || loadingFachada}
+            className="bg-red-600 hover:bg-red-700 disabled:bg-gray-300
+            text-white px-5 py-2.5 rounded-xl font-semibold
+            transition-all duration-300"
+          >
+            {loadingFachada ? "Enviando..." : "Atualizar Fachada"}
+          </button>
         </div>
       </div>
     </section>

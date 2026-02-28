@@ -1,7 +1,7 @@
 import { CardapioProduto } from "../types/cardapio";
 
 // exemplo de dados
-export const cardapiosJson: CardapioProduto[] = [
+export const DADOS_CARDAPIO: CardapioProduto[] = [
   {
     title: "Rolinho de Queijo",
     topico: "Entradas",

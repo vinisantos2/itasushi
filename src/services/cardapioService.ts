@@ -12,7 +12,8 @@ import {
 } from "firebase/firestore";
 import { CardapioProduto } from "../types/cardapio";
 import { db } from "../firebase/firebaseConfig";
-import { cardapiosJson } from "../data/JsonCardapio";
+import { DADOS_CARDAPIO } from "../data/JsonCardapio";
+import { uploadFileToFirebase } from "../firebase/uploadImage";
 
 const colRef = collection(db, "cardapio");
 
@@ -68,7 +69,7 @@ export async function getCardapioById(
 }
 
 export async function importarCardapio() {
-  for (const item of cardapiosJson) {
+  for (const item of DADOS_CARDAPIO) {
     try {
       await addDoc(colRef, item);
     } catch (e) {
@@ -77,4 +78,34 @@ export async function importarCardapio() {
   }
 
   console.log("Importação concluída!");
+}
+
+async function importarCardapioEmLote() {
+  for (const item of DADOS_CARDAPIO) {
+    try {
+      let imageUrl = "";
+
+      // ✅ se tiver imagem, faz upload
+      if (item.imagePath) {
+        const response = await fetch(item.imagePath);
+        const blob = await response.blob();
+
+        const file = new File([blob], `${item.title}.png`, {
+          type: blob.type,
+        });
+
+        imageUrl = await uploadFileToFirebase(file);
+      }
+
+      // ✅ salva no Firestore
+      await addCardapio({
+        ...item,
+        imageUrl,
+      });
+
+      console.log("✅ Importado:", item.title);
+    } catch (err) {
+      console.error("❌ Erro ao importar:", item.title, err);
+    }
+  }
 }
