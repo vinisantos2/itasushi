@@ -3,6 +3,9 @@ import Footer from "./Footer";
 import Header from "./Header";
 import SubFooter from "./SubFooter";
 import { Toaster } from "react-hot-toast";
+import Script from "next/script";
+
+const GA_ID = "G-4XKV3C5HZR";
 
 export default function RootLayout({
   children,
@@ -10,18 +13,32 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <div className="flex flex-col min-h-screen">
-      <Header />
-      {/* 🔴 Faixa vermelha lateral forte com fade */}
+    <>
+      {/* Google Analytics */}
+      <Script
+        src={`https://www.googletagmanager.com/gtag/js?id=${GA_ID}`}
+        strategy="afterInteractive"
+      />
+      <Script id="google-analytics" strategy="afterInteractive">
+        {`
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+          gtag('config', '${GA_ID}');
+        `}
+      </Script>
 
-      <main className="flex-1">
-        
-        {children}
-      </main>
+      <div className="flex flex-col min-h-screen">
+        <Header />
 
-      <Footer />
-      <SubFooter />
-      <Toaster position="top-center" />
-    </div>
+        <main className="flex-1">
+          {children}
+        </main>
+
+        <Footer />
+        <SubFooter />
+        <Toaster position="top-center" />
+      </div>
+    </>
   );
 }
